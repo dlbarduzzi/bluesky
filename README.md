@@ -6,10 +6,6 @@
   </a>
 </p>
 
-## About
-
-A custom auth application with support for credentials and social providers.
-
 ## License
 
 [MIT](./LICENSE)
