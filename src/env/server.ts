@@ -7,15 +7,15 @@ export const env = createEnv({
   },
   onValidationError: issues => {
     console.error("❌ Invalid server environment variables ❌", issues)
-    // eslint-disable-next-line n/no-process-exit
+    // eslint-disable-next-line node/no-process-exit
     process.exit(1)
   },
   runtimeEnv: {
-    /* eslint-disable n/no-process-env */
+    /* eslint-disable node/no-process-env */
     NODE_ENV: process.env.NODE_ENV,
-    /* eslint-enable n/no-process-env */
+    /* eslint-enable node/no-process-env */
   },
   emptyStringAsUndefined: true,
-  /* eslint-disable-next-line n/no-process-env */
+  /* eslint-disable-next-line node/no-process-env */
   skipValidation: process.env.SKIP_ENV_VALIDATIONS === "true",
 })

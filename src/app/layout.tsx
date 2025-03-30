@@ -40,7 +40,7 @@ export default function RootLayout({
           "min-h-screen bg-white font-sans text-base text-black antialiased",
           "selection:bg-yellow-200 selection:text-black",
           fontGeistSans.variable,
-          fontGeistMono.variable
+          fontGeistMono.variable,
         )}
       >
         {children}
