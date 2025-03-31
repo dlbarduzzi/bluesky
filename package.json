@@ -11,12 +11,16 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@radix-ui/react-label": "^2.1.2",
+    "@radix-ui/react-slot": "^1.1.2",
     "@t3-oss/env-nextjs": "^0.12.0",
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "jiti": "^2.4.2",
     "next": "15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.55.0",
     "tailwind-merge": "^3.0.2",
     "zod": "^3.24.2"
   },
