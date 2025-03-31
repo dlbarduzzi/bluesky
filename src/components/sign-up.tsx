@@ -1,6 +1,7 @@
 "use client"
 
-import { z } from "zod"
+import type { SignUpSchema } from "@/apis/users/schemas"
+
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
@@ -17,13 +18,7 @@ import {
 } from "@/components/ui/form"
 
 import { delay } from "@/lib/utils"
-
-const signUpSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-})
-
-type SignUpSchema = z.infer<typeof signUpSchema>
+import { signUpSchema } from "@/apis/users/schemas"
 
 export function SignUp() {
   const form = useForm<SignUpSchema>({
