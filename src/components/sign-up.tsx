@@ -7,12 +7,13 @@ import NextLink from "next/link"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Eye, EyeClosed } from "lucide-react"
+import { Check, Circle, Eye, EyeClosed, X as IconX } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { ButtonSpinner } from "./button-spinner"
+import { ButtonSpinner } from "@/components/button-spinner"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 import {
   FormControl,
@@ -23,12 +24,25 @@ import {
   FormProvider,
 } from "@/components/ui/form"
 
+import {
+  signUpSchema,
+  PASSWORD_MIN_CHARS,
+  PASSWORD_MAX_CHARS,
+} from "@/apis/users/schemas"
+
+import {
+  hasNumber,
+  hasSpecialChar,
+  hasLowercaseChar,
+  hasUppercaseChar,
+} from "@/tools/strings"
+
 import { cn, delay } from "@/lib/utils"
-import { signUpSchema } from "@/apis/users/schemas"
 
 export function SignUp() {
   const [showPassword, setShowPassword] = useState(false)
   const [isTermsChecked, setIsTermsChecked] = useState(true)
+  const [showPasswordCriteria, setShowPasswordCriteria] = useState(false)
 
   const form = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
@@ -43,6 +57,7 @@ export function SignUp() {
   async function onSubmit(data: SignUpSchema) {
     if (!isTermsChecked) {
       // TODO: Add a toast instead of an alert.
+      // eslint-disable-next-line no-alert
       alert("[ERROR]: You must accept terms and conditions")
       return
     }
@@ -86,7 +101,38 @@ export function SignUp() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <div className="flex">
+                  <div className="flex-1">
+                    <FormLabel>Password</FormLabel>
+                  </div>
+                  <Popover
+                    open={showPasswordCriteria}
+                    onOpenChange={setShowPasswordCriteria}
+                  >
+                    <PopoverTrigger
+                      className={cn(
+                        "mr-1 text-sm font-medium",
+                        isSubmitting
+                          ? "pointer-events-none text-gray-400"
+                          : "text-gray-500 hover:text-gray-700",
+                      )}
+                    >
+                      Show criteria
+                    </PopoverTrigger>
+                    <PopoverContent
+                      side="top"
+                      align="end"
+                      className="w-72"
+                      onFocusOutside={e => e.preventDefault()}
+                      onPointerDownOutside={e => e.preventDefault()}
+                    >
+                      <PasswordCriteria
+                        password={field.value}
+                        hasError={!!errors.password}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
                 <div className="relative mt-0.5">
                   <FormControl>
                     <Input
@@ -114,7 +160,8 @@ export function SignUp() {
                     >
                       {showPassword
                         ? <Eye className="size-6" />
-                        : <EyeClosed className="size-6" />}
+                        : <EyeClosed className="size-6" />
+                      }
                     </div>
                   </div>
                 </div>
@@ -166,5 +213,77 @@ export function SignUp() {
         </form>
       </FormProvider>
     </div>
+  )
+}
+
+type PasswordCriteriaProps = {
+  password: string
+  hasError: boolean
+}
+
+function PasswordCriteria({ password, hasError }: PasswordCriteriaProps) {
+  return (
+    <div className="mb-1">
+      <div className="text-sm font-semibold text-black">Password Criteria</div>
+      <div className="mt-1 text-[13px] leading-4 text-gray-800">
+        Your password must meet the following requirements:
+      </div>
+      <div className="mt-2.5 border-t border-t-gray-200">
+        <ul className="mt-2.5 space-y-1">
+          <PasswordValidate
+            isValid={hasNumber(password)}
+            hasError={hasError}
+            description="Contain a number"
+          />
+          <PasswordValidate
+            isValid={hasSpecialChar(password)}
+            hasError={hasError}
+            description="Contain a special character"
+          />
+          <PasswordValidate
+            isValid={hasLowercaseChar(password)}
+            hasError={hasError}
+            description="Contain a lowercase character"
+          />
+          <PasswordValidate
+            isValid={hasUppercaseChar(password)}
+            hasError={hasError}
+            description="Contain an uppercase character"
+          />
+          <PasswordValidate
+            isValid={
+              password.length >= PASSWORD_MIN_CHARS
+              && password.length <= PASSWORD_MAX_CHARS
+            }
+            hasError={hasError}
+            // eslint-disable-next-line style/max-len
+            description={`Between ${PASSWORD_MIN_CHARS} and ${PASSWORD_MAX_CHARS} characters long`}
+          />
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+type PasswordValidateProps = {
+  isValid: boolean
+  hasError: boolean
+  description: string
+}
+
+function PasswordValidate({ isValid, hasError, description }: PasswordValidateProps) {
+  return (
+    <li className="flex items-center gap-x-1.5 text-sm text-black">
+      <span className="flex size-5 items-center justify-center">
+        {isValid ? (
+          <Check className="size-5 text-green-500" />
+        ) : hasError ? (
+          <IconX className="size-5 h-full text-red-500" />
+        ) : (
+          <Circle className="size-3 h-full fill-gray-300 stroke-none" />
+        )}
+      </span>
+      {description}
+    </li>
   )
 }

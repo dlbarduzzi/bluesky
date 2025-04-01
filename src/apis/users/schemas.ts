@@ -7,8 +7,8 @@ import {
   hasUppercaseChar,
 } from "@/tools/strings"
 
-const PASSWORD_MIN_CHARS = 8
-const PASSWORD_MAX_CHARS = 72
+export const PASSWORD_MIN_CHARS = 8
+export const PASSWORD_MAX_CHARS = 72
 
 export const signUpSchema = z.object({
   email: z

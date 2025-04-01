@@ -36,7 +36,9 @@ export default antfu({
     "regexp/no-useless-escape": "off",
     "regexp/no-unused-capturing-group": "off",
     "regexp/strict": "off",
+    "style/jsx-curly-newline": "off",
     "style/max-len": ["error", { code: 88 }],
+    "style/multiline-ternary": "off",
     "style/quotes": "error",
     "ts/no-unused-vars": ["error", {
       args: "all",
