@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest"
 describe("apis.users.schemas", () => {
   it("should fail on empty object", () => {
     const parsed = signUpSchema.safeParse({})
-    if (!parsed.error) {
+    if (parsed.success) {
       throw new Error("expected sign up schema to fail")
     }
     const errors = parsed.error.flatten().fieldErrors
@@ -15,7 +15,8 @@ describe("apis.users.schemas", () => {
   })
   it("should fail on empty field", () => {
     const parsed = signUpSchema.safeParse({ email: "", password: "" })
-    if (!parsed.error) {
+    expect(parsed.success).toBeFalsy()
+    if (parsed.success) {
       throw new Error("expected sign up schema to fail")
     }
     const errors = parsed.error.flatten().fieldErrors
@@ -26,7 +27,7 @@ describe("apis.users.schemas", () => {
   })
   it("email should fail on invalid field", () => {
     const parsed = signUpSchema.safeParse({ email: "test", password: "testPassword1!" })
-    if (!parsed.error) {
+    if (parsed.success) {
       throw new Error("expected sign up schema to fail")
     }
     const errors = parsed.error.flatten().fieldErrors
@@ -38,15 +39,15 @@ describe("apis.users.schemas", () => {
       email: "test@email.com",
       password: "",
     })
-    if (!parsed.error) {
+    if (parsed.success) {
       throw new Error("expected sign up schema to fail")
     }
     const errors = parsed.error.flatten().fieldErrors
     expect(errors).toHaveProperty("password")
-    /* eslint-disable style/max-len */
     expect(errors.password).toContain("Password is required")
     expect(errors.password).toContain("Password must be at least 8 characters long")
     expect(errors.password).toContain("Password must contain at least 1 number")
+    /* eslint-disable style/max-len */
     expect(errors.password).toContain("Password must contain at least 1 special character")
     expect(errors.password).toContain("Password must contain at least 1 lowercase character")
     expect(errors.password).toContain("Password must contain at least 1 uppercase character")
@@ -57,7 +58,7 @@ describe("apis.users.schemas", () => {
       email: "test@email.com",
       password: "t".repeat(73),
     })
-    if (!parsed.error) {
+    if (parsed.success) {
       throw new Error("expected sign up schema to fail")
     }
     const errors = parsed.error.flatten().fieldErrors
