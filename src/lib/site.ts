@@ -7,7 +7,7 @@ type SiteConfig = {
 }
 
 export const siteConfig: SiteConfig = {
-  name: "BlueSky",
+  name: "bluesky",
   description: "A sample app built with love.",
   url: env.NEXT_PUBLIC_APP_URL,
 }

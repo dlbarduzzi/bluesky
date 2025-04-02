@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils"
 import { siteConfig } from "@/lib/site"
 import { fontGeistSans, fontGeistMono } from "@/lib/fonts"
 
+import { QueryProvider } from "@/providers/react-query"
+
 export const metadata: Metadata = {
   title: {
     default: siteConfig.name,
@@ -43,7 +45,9 @@ export default function RootLayout({
           fontGeistMono.variable,
         )}
       >
-        {children}
+        <QueryProvider>
+          {children}
+        </QueryProvider>
       </body>
     </html>
   )

@@ -37,7 +37,35 @@ import {
   hasUppercaseChar,
 } from "@/tools/strings"
 
-import { cn, delay } from "@/lib/utils"
+import { cn } from "@/lib/utils"
+
+// TODO: Refactor START
+import { useMutation } from "@tanstack/react-query"
+
+async function signUp(data: SignUpSchema) {
+  // eslint-disable-next-line no-console
+  console.log(data)
+
+  try {
+    const resp = await fetch("/api/v1/users/sign-up")
+    if (!resp.ok) {
+      console.error("ERROR RESP", resp.status, resp.statusText)
+      return { ok: false }
+    }
+    const json = await resp.json()
+    // TODO: Should parse schema.
+    if (!json.ok) {
+      console.error("ERROR JSON", json)
+      return { ok: false }
+    }
+    return { ok: true }
+  }
+  catch (error) {
+    console.error(error)
+    return { ok: false }
+  }
+}
+// TODO: Refactor END
 
 export function SignUp() {
   const [showPassword, setShowPassword] = useState(false)
@@ -53,6 +81,7 @@ export function SignUp() {
   })
 
   const { errors, isSubmitting } = form.formState
+  const signUpMutation = useMutation({ mutationFn: signUp })
 
   async function onSubmit(data: SignUpSchema) {
     if (!isTermsChecked) {
@@ -62,9 +91,12 @@ export function SignUp() {
       return
     }
     setShowPassword(() => false)
-    await delay(2000)
+    setShowPasswordCriteria(() => false)
+
+    const resp = await signUpMutation.mutateAsync(data)
+
     // eslint-disable-next-line no-console
-    console.log(data)
+    console.log({ resp })
   }
 
   return (
