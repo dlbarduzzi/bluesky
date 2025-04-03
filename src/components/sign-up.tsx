@@ -43,13 +43,15 @@ import { cn } from "@/lib/utils"
 import { useMutation } from "@tanstack/react-query"
 
 async function signUp(data: SignUpSchema) {
-  // eslint-disable-next-line no-console
-  console.log(data)
-
   try {
-    const resp = await fetch("/api/v1/users/sign-up")
-    if (!resp.ok) {
+    const resp = await fetch("/api/v1/users/sign-up", {
+      body: JSON.stringify(data),
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    })
+    if (!resp.ok && resp.status > 499) {
       console.error("ERROR RESP", resp.status, resp.statusText)
+      console.error(resp)
       return { ok: false }
     }
     const json = await resp.json()
@@ -96,7 +98,7 @@ export function SignUp() {
     const resp = await signUpMutation.mutateAsync(data)
 
     // eslint-disable-next-line no-console
-    console.log({ resp })
+    console.log(resp)
   }
 
   return (
