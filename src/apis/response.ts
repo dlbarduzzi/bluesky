@@ -1,11 +1,13 @@
+export type BadRequest = { ok: false, error: "Bad Request", message: string }
+
 export function sendBadRequest(message: string) {
-  return Response.json({ ok: false, error: "Bad Request", message }, {
-    status: 400,
-  })
+  const response: BadRequest = { ok: false, error: "Bad Request", message }
+  return Response.json(response, { status: 400 })
 }
 
-export function sendBadPayload<T>(fields: T) {
-  return Response.json({ ok: false, error: "Unprocessable Entity", fields }, {
-    status: 422,
-  })
+export type BadPayload<T> = { ok: false, error: "Zod Error", details: T }
+
+export function sendBadPayload<T>(details: T) {
+  const response: BadPayload<T> = { ok: false, error: "Zod Error", details }
+  return Response.json(response, { status: 422 })
 }

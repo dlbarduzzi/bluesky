@@ -1,11 +1,13 @@
 "use client"
 
-import type { SignUpSchema } from "@/apis/users/schemas"
+import type { BadPayload, BadRequest } from "@/apis/response"
+import type { SignUpSchema, SignUpFieldErrors } from "@/apis/users/schemas"
 
 import NextLink from "next/link"
 
 import { useForm } from "react-hook-form"
 import { useState } from "react"
+import { useMutation } from "@tanstack/react-query"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Check, Circle, Eye, EyeClosed, X as IconX } from "lucide-react"
 
@@ -39,35 +41,53 @@ import {
 
 import { cn } from "@/lib/utils"
 
-// TODO: Refactor START
-import { useMutation } from "@tanstack/react-query"
-
 async function signUp(data: SignUpSchema) {
+  const request = new Request("/api/v1/users/sign-up", {
+    body: JSON.stringify(data),
+    method: "POST",
+  })
+  request.headers.set("Content-Type", "application/json")
+  let response: Response
   try {
-    const resp = await fetch("/api/v1/users/sign-up", {
-      body: JSON.stringify(data),
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    })
-    if (!resp.ok && resp.status > 499) {
-      console.error("ERROR RESP", resp.status, resp.statusText)
-      console.error(resp)
-      return { ok: false }
-    }
-    const json = await resp.json()
-    // TODO: Should parse schema.
-    if (!json.ok) {
-      console.error("ERROR JSON", json)
-      return { ok: false }
-    }
-    return { ok: true }
+    response = await fetch(request)
   }
   catch (error) {
-    console.error(error)
-    return { ok: false }
+    console.error("[RESPONSE ERROR]", error)
+    return
+  }
+  if (response.status > 499) {
+    console.error("[STATUS ERROR]", response.statusText, response.status)
+    return
+  }
+  let json: BadRequest | BadPayload<SignUpFieldErrors>
+  try {
+    json = await response.json()
+  }
+  catch (error) {
+    console.error("[JSON ERROR]", error)
+    return
+  }
+  if (!json.ok) {
+    if (json.error === "Bad Request") {
+      console.error("BAD REQUEST...")
+      console.warn(json.message)
+      return
+    }
+    if (json.error === "Zod Error") {
+      console.error("ZOD ERROR...")
+      const errors = new Map<string, string>()
+      Object.entries(json.details).forEach(([field, messages]) => {
+        if (messages.length > 0) {
+          errors.set(field, messages[0] ?? "")
+        }
+      })
+      console.warn("ERRORS", errors)
+      return
+    }
+    console.error("HANDLE CASE...")
+    console.warn(json)
   }
 }
-// TODO: Refactor END
 
 export function SignUp() {
   const [showPassword, setShowPassword] = useState(false)

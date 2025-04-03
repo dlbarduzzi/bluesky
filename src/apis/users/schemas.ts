@@ -58,3 +58,6 @@ export const signUpSchema = z.object({
 })
 
 export type SignUpSchema = z.infer<typeof signUpSchema>
+
+type FieldErrors<T extends z.ZodTypeAny> = z.inferFlattenedErrors<T>["fieldErrors"]
+export type SignUpFieldErrors = FieldErrors<typeof signUpSchema>
